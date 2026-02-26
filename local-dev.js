@@ -44,7 +44,8 @@ app.post('/api/tools', (req, res) => {
     name: String(tool.name).trim(),
     url: String(tool.url).trim(),
     description: (tool.description && String(tool.description).trim()) || '',
-    icon: (tool.icon && String(tool.icon).trim()) || ''
+    icon: (tool.icon && String(tool.icon).trim()) || '',
+    type: (tool.type === 'plugin' ? 'plugin' : 'link')
   };
   tools.push(newTool);
   writeTools(tools);
