@@ -83,9 +83,29 @@
     }
     if (toolType) toolType.addEventListener('change', updateToolTypeHint);
 
+    function getLuminance(hex) {
+      if (!hex || typeof hex !== 'string') return 1;
+      hex = hex.replace(/^#/, '');
+      if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      if (hex.length !== 6) return 1;
+      var r = parseInt(hex.slice(0, 2), 16) / 255;
+      var g = parseInt(hex.slice(2, 4), 16) / 255;
+      var b = parseInt(hex.slice(4, 6), 16) / 255;
+      r = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+      g = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+      b = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    }
+
     function applyTheme(theme) {
-      if (!theme) return;
       var root = document.documentElement;
+      if (!theme) {
+        root.classList.remove('theme-dark');
+        root.style.removeProperty('--text');
+        root.style.removeProperty('--text-muted');
+        root.style.removeProperty('--card-border');
+        return;
+      }
       var p1 = theme.primaryColor && theme.primaryColor.trim();
       var p2 = theme.primaryColorEnd && theme.primaryColorEnd.trim();
       if (p1) {
@@ -150,6 +170,21 @@
       if (theme.cardSpacing) document.body.classList.add('card-spacing-' + theme.cardSpacing);
       document.body.classList.remove('card-radius-small', 'card-radius-medium', 'card-radius-large');
       if (theme.cardRadius) document.body.classList.add('card-radius-' + theme.cardRadius);
+      var cardBg = (theme.cardBgColor !== undefined && theme.cardBgColor !== null) ? (theme.cardBgColor || '#ffffff') : '#ffffff';
+      var modalBg = (theme.modalBgColor !== undefined && theme.modalBgColor !== null) ? (theme.modalBgColor || '#ffffff') : '#ffffff';
+      var bodyStart = (theme.bodyGradientStart && theme.bodyGradientStart.trim()) || (theme.primaryColor && theme.primaryColor.trim()) || '';
+      var isDark = getLuminance(cardBg) < 0.4 || getLuminance(modalBg) < 0.4 || (bodyStart && getLuminance(bodyStart) < 0.4);
+      if (isDark) {
+        root.classList.add('theme-dark');
+        root.style.setProperty('--text', '#f0f0f0');
+        root.style.setProperty('--text-muted', '#b8b8b8');
+        root.style.setProperty('--card-border', 'rgba(255,255,255,0.12)');
+      } else {
+        root.classList.remove('theme-dark');
+        root.style.removeProperty('--text');
+        root.style.removeProperty('--text-muted');
+        root.style.removeProperty('--card-border');
+      }
     }
 
     function loadTheme() {

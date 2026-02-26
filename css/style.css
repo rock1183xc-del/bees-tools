@@ -545,6 +545,27 @@ body {
   background: rgba(197, 48, 48, 0.1);
 }
 
+/* 暗色模式：背景偏暗時自動改用淺色文字與邊框 */
+.theme-dark .modal-header {
+  background: rgba(255, 255, 255, 0.08);
+}
+.theme-dark .modal-footer {
+  background: rgba(255, 255, 255, 0.06);
+}
+.theme-dark .modal-body input,
+.theme-dark .modal-body select {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+.theme-dark .wish-pool-panel-header {
+  background: rgba(255, 255, 255, 0.08);
+}
+.theme-dark .loading,
+.theme-dark .admin-tool-list-empty {
+  color: var(--text-muted);
+}
+
 /* 許願池：右下角浮動客服 */
 .wish-pool-widget {
   position: fixed;
