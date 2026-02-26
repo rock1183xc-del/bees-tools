@@ -1,2 +1,3 @@
-# 部署時排除：本機用的資料夾，Vercel 用 Redis
+# 部署時排除：本機用的資料夾（Vercel 用 Redis）
 data/
+local-dev.js
