@@ -44,11 +44,26 @@
       </div>
       <div class="modal-body">
         <label>主題色（頁面）</label>
-        <input type="color" id="inputPrimaryColor" value="#e6a700" title="標題列與背景裝飾">
+        <div class="settings-row two-col">
+          <div><label class="label-inline">起色</label><input type="color" id="inputPrimaryColor" value="#e6a700"></div>
+          <div><label class="label-inline">迄色（選填＝漸層）</label><input type="color" id="inputPrimaryColorEnd" value=""></div>
+        </div>
         <label>按鈕顏色</label>
-        <input type="color" id="inputButtonColor" value="#e6a700" title="按鈕與卡片圖示">
+        <div class="settings-row two-col">
+          <div><label class="label-inline">起色</label><input type="color" id="inputButtonColor" value="#e6a700"></div>
+          <div><label class="label-inline">迄色（選填＝漸層）</label><input type="color" id="inputButtonColorEnd" value=""></div>
+        </div>
         <label>卡片背景色（整體）</label>
-        <input type="color" id="inputCardBgColor" value="#ffffff" title="所有卡片的背景，單張可再於編輯時覆蓋">
+        <div class="settings-row two-col">
+          <div><label class="label-inline">起色</label><input type="color" id="inputCardBgColor" value="#ffffff"></div>
+          <div><label class="label-inline">迄色（選填＝漸層）</label><input type="color" id="inputCardBgColorEnd" value=""></div>
+        </div>
+        <label>彈窗內容區背景</label>
+        <p class="form-hint">介面設定、管理者等彈窗的內容區，不跟隨卡片</p>
+        <div class="settings-row two-col">
+          <div><label class="label-inline">起色</label><input type="color" id="inputModalBgColor" value="#ffffff"></div>
+          <div><label class="label-inline">迄色（選填＝漸層）</label><input type="color" id="inputModalBgColorEnd" value=""></div>
+        </div>
         <label>大畫面漸層</label>
         <p class="form-hint">主內容區的漸層色，留空則使用上方主題色</p>
         <div class="settings-row two-col">

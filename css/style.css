@@ -22,6 +22,7 @@
   --card-padding: 1.25rem;
   --radius-btn: 10px;
   --radius-modal: 16px;
+  --modal-bg: #ffffff;
 }
 
 * {
@@ -94,25 +95,25 @@ body {
 }
 
 .btn-admin {
-  background: var(--button-color);
+  background: var(--button-gradient, var(--button-color));
   color: #fff;
   box-shadow: 0 2px 8px color-mix(in srgb, var(--button-color) 40%, transparent);
 }
 
 .btn-admin:hover {
-  background: var(--button-color-hover);
+  background: var(--button-gradient-hover, var(--button-color-hover));
   box-shadow: 0 4px 12px color-mix(in srgb, var(--button-color) 45%, transparent);
 }
 
 .btn-primary {
-  background: var(--button-color);
+  background: var(--button-gradient, var(--button-color));
   color: #fff;
   padding: 0.6rem 1.25rem;
   box-shadow: 0 2px 8px color-mix(in srgb, var(--button-color) 35%, transparent);
 }
 
 .btn-primary:hover {
-  background: var(--button-color-hover);
+  background: var(--button-gradient-hover, var(--button-color-hover));
   box-shadow: 0 4px 12px color-mix(in srgb, var(--button-color) 45%, transparent);
 }
 
@@ -307,7 +308,7 @@ body {
 }
 
 .modal-content {
-  background: var(--card-bg);
+  background: var(--modal-bg, #ffffff);
   border-radius: var(--radius-modal);
   max-width: 420px;
   width: 100%;

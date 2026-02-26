@@ -15,7 +15,12 @@
     const saveSettings = document.getElementById('saveSettings');
     const inputPrimaryColor = document.getElementById('inputPrimaryColor');
     const inputButtonColor = document.getElementById('inputButtonColor');
+    const inputButtonColorEnd = document.getElementById('inputButtonColorEnd');
     const inputCardBgColor = document.getElementById('inputCardBgColor');
+    const inputCardBgColorEnd = document.getElementById('inputCardBgColorEnd');
+    const inputModalBgColor = document.getElementById('inputModalBgColor');
+    const inputModalBgColorEnd = document.getElementById('inputModalBgColorEnd');
+    const inputPrimaryColorEnd = document.getElementById('inputPrimaryColorEnd');
     const inputBodyGradientStart = document.getElementById('inputBodyGradientStart');
     const inputBodyGradientEnd = document.getElementById('inputBodyGradientEnd');
     const clearBodyGradientBtn = document.getElementById('clearBodyGradientBtn');
@@ -81,25 +86,52 @@
     function applyTheme(theme) {
       if (!theme) return;
       var root = document.documentElement;
-      if (theme.primaryColor) {
-        root.style.setProperty('--primary', theme.primaryColor);
-        root.style.setProperty('--primary-hover', theme.primaryColorHover || theme.primaryColor);
+      var p1 = theme.primaryColor && theme.primaryColor.trim();
+      var p2 = theme.primaryColorEnd && theme.primaryColorEnd.trim();
+      if (p1) {
+        root.style.setProperty('--primary', p1);
+        root.style.setProperty('--primary-hover', theme.primaryColorHover || p1);
       }
-      if (theme.buttonColor) {
-        root.style.setProperty('--button-color', theme.buttonColor);
-        root.style.setProperty('--button-color-hover', theme.buttonColorHover || theme.buttonColor);
+      if (p1 && p2) {
+        root.style.setProperty('--header-gradient', 'linear-gradient(135deg, color-mix(in srgb, ' + p1 + ' 35%, #000) 0%, color-mix(in srgb, ' + p2 + ' 22%, #000) 100%)');
+        root.style.setProperty('--body-pattern', 'radial-gradient(ellipse at top, color-mix(in srgb, ' + p1 + ' 22%, transparent) 0%, color-mix(in srgb, ' + p2 + ' 12%, transparent) 50%, transparent 55%)');
+      } else if (p1) {
+        root.style.setProperty('--header-gradient', 'linear-gradient(135deg, color-mix(in srgb, var(--primary) 35%, #000) 0%, color-mix(in srgb, var(--primary) 22%, #000) 100%)');
+        root.style.setProperty('--body-pattern', 'radial-gradient(ellipse at top, color-mix(in srgb, var(--primary) 22%, transparent) 0%, transparent 55%)');
       }
-      if (theme.cardBgColor !== undefined) {
-        root.style.setProperty('--card-bg', theme.cardBgColor || '#ffffff');
+      var b1 = theme.buttonColor && theme.buttonColor.trim();
+      var b2 = theme.buttonColorEnd && theme.buttonColorEnd.trim();
+      if (b1) {
+        root.style.setProperty('--button-color', b1);
+        root.style.setProperty('--button-color-hover', theme.buttonColorHover || b2 || b1);
       }
+      if (b1 && b2) {
+        root.style.setProperty('--button-gradient', 'linear-gradient(145deg, ' + b1 + ' 0%, ' + b2 + ' 100%)');
+        root.style.setProperty('--button-gradient-hover', 'linear-gradient(145deg, ' + (theme.buttonColorHover || b2) + ' 0%, ' + b1 + ' 100%)');
+      } else if (b1) {
+        root.style.setProperty('--button-gradient', b1);
+        root.style.setProperty('--button-gradient-hover', theme.buttonColorHover || b1);
+      }
+      var c1 = theme.cardBgColor !== undefined && theme.cardBgColor !== null ? (theme.cardBgColor || '#ffffff') : null;
+      var c2 = theme.cardBgColorEnd && theme.cardBgColorEnd.trim();
+      if (c1 !== null) {
+        if (c2) root.style.setProperty('--card-bg', 'linear-gradient(135deg, ' + c1 + ' 0%, ' + c2 + ' 100%)');
+        else root.style.setProperty('--card-bg', c1);
+      }
+      var m1 = theme.modalBgColor !== undefined && theme.modalBgColor !== null ? (theme.modalBgColor || '#ffffff') : '#ffffff';
+      var m2 = theme.modalBgColorEnd && theme.modalBgColorEnd.trim();
+      if (m2) root.style.setProperty('--modal-bg', 'linear-gradient(135deg, ' + m1 + ' 0%, ' + m2 + ' 100%)');
+      else root.style.setProperty('--modal-bg', m1);
       var start = theme.bodyGradientStart && theme.bodyGradientStart.trim();
       var end = theme.bodyGradientEnd && theme.bodyGradientEnd.trim();
       if (start && end) {
         root.style.setProperty('--body-bg', start);
         root.style.setProperty('--body-pattern', 'linear-gradient(135deg, ' + start + ' 0%, ' + end + ' 100%)');
+      } else if (p1 && p2) {
+        root.style.setProperty('--body-bg', p1);
       } else {
         root.style.setProperty('--body-bg', '#f0f2f5');
-        root.style.setProperty('--body-pattern', 'radial-gradient(ellipse at top, color-mix(in srgb, var(--primary) 22%, transparent) 0%, transparent 55%)');
+        if (!p1) root.style.setProperty('--body-pattern', 'radial-gradient(ellipse at top, color-mix(in srgb, var(--primary) 22%, transparent) 0%, transparent 55%)');
       }
       if (theme.backgroundImage) {
         document.body.style.backgroundImage = 'linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.85)), url(' + theme.backgroundImage + ')';
@@ -126,8 +158,13 @@
         var theme = raw ? JSON.parse(raw) : null;
         applyTheme(theme);
         if (theme && inputPrimaryColor) inputPrimaryColor.value = theme.primaryColor || '#e6a700';
+        if (inputPrimaryColorEnd) inputPrimaryColorEnd.value = (theme && theme.primaryColorEnd) ? theme.primaryColorEnd : '';
         if (theme && inputButtonColor) inputButtonColor.value = theme.buttonColor || '#e6a700';
+        if (inputButtonColorEnd) inputButtonColorEnd.value = (theme && theme.buttonColorEnd) ? theme.buttonColorEnd : '';
         if (inputCardBgColor) inputCardBgColor.value = (theme && theme.cardBgColor) ? theme.cardBgColor : '#ffffff';
+        if (inputCardBgColorEnd) inputCardBgColorEnd.value = (theme && theme.cardBgColorEnd) ? theme.cardBgColorEnd : '';
+        if (inputModalBgColor) inputModalBgColor.value = (theme && theme.modalBgColor) ? theme.modalBgColor : '#ffffff';
+        if (inputModalBgColorEnd) inputModalBgColorEnd.value = (theme && theme.modalBgColorEnd) ? theme.modalBgColorEnd : '';
         if (inputBodyGradientStart && inputBodyGradientEnd) {
           if (theme && theme.bodyGradientStart && theme.bodyGradientEnd) {
             inputBodyGradientStart.value = theme.bodyGradientStart;
@@ -155,8 +192,13 @@
     function saveTheme() {
       var theme = {
         primaryColor: inputPrimaryColor ? inputPrimaryColor.value : '#e6a700',
+        primaryColorEnd: (inputPrimaryColorEnd && inputPrimaryColorEnd.value.trim()) ? inputPrimaryColorEnd.value.trim() : '',
         buttonColor: inputButtonColor ? inputButtonColor.value : '#e6a700',
+        buttonColorEnd: (inputButtonColorEnd && inputButtonColorEnd.value.trim()) ? inputButtonColorEnd.value.trim() : '',
         cardBgColor: inputCardBgColor ? inputCardBgColor.value : '#ffffff',
+        cardBgColorEnd: (inputCardBgColorEnd && inputCardBgColorEnd.value.trim()) ? inputCardBgColorEnd.value.trim() : '',
+        modalBgColor: inputModalBgColor ? inputModalBgColor.value : '#ffffff',
+        modalBgColorEnd: (inputModalBgColorEnd && inputModalBgColorEnd.value.trim()) ? inputModalBgColorEnd.value.trim() : '',
         bodyGradientStart: (inputBodyGradientStart && inputBodyGradientStart.getAttribute('data-use-default') !== 'true') ? (inputBodyGradientStart.value || '') : '',
         bodyGradientEnd: (inputBodyGradientEnd && inputBodyGradientEnd.getAttribute('data-use-default') !== 'true') ? (inputBodyGradientEnd.value || '') : '',
         fontSize: inputFontSize ? inputFontSize.value : 'medium',
