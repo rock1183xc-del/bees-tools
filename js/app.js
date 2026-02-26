@@ -15,6 +15,7 @@
     const saveSettings = document.getElementById('saveSettings');
     const inputPrimaryColor = document.getElementById('inputPrimaryColor');
     const inputButtonColor = document.getElementById('inputButtonColor');
+    const inputCardBgColor = document.getElementById('inputCardBgColor');
     const inputBodyGradientStart = document.getElementById('inputBodyGradientStart');
     const inputBodyGradientEnd = document.getElementById('inputBodyGradientEnd');
     const clearBodyGradientBtn = document.getElementById('clearBodyGradientBtn');
@@ -31,6 +32,7 @@
     const toolType = document.getElementById('toolType');
     const toolTypeHint = document.getElementById('toolTypeHint');
     const labelToolUrl = document.getElementById('labelToolUrl');
+    const toolCardColor = document.getElementById('toolCardColor');
     const toolIcon = document.getElementById('toolIcon');
     const toolIconFile = document.getElementById('toolIconFile');
     const clearToolIconBtn = document.getElementById('clearToolIconBtn');
@@ -87,6 +89,9 @@
         root.style.setProperty('--button-color', theme.buttonColor);
         root.style.setProperty('--button-color-hover', theme.buttonColorHover || theme.buttonColor);
       }
+      if (theme.cardBgColor !== undefined) {
+        root.style.setProperty('--card-bg', theme.cardBgColor || '#ffffff');
+      }
       var start = theme.bodyGradientStart && theme.bodyGradientStart.trim();
       var end = theme.bodyGradientEnd && theme.bodyGradientEnd.trim();
       if (start && end) {
@@ -122,6 +127,7 @@
         applyTheme(theme);
         if (theme && inputPrimaryColor) inputPrimaryColor.value = theme.primaryColor || '#e6a700';
         if (theme && inputButtonColor) inputButtonColor.value = theme.buttonColor || '#e6a700';
+        if (inputCardBgColor) inputCardBgColor.value = (theme && theme.cardBgColor) ? theme.cardBgColor : '#ffffff';
         if (inputBodyGradientStart && inputBodyGradientEnd) {
           if (theme && theme.bodyGradientStart && theme.bodyGradientEnd) {
             inputBodyGradientStart.value = theme.bodyGradientStart;
@@ -150,6 +156,7 @@
       var theme = {
         primaryColor: inputPrimaryColor ? inputPrimaryColor.value : '#e6a700',
         buttonColor: inputButtonColor ? inputButtonColor.value : '#e6a700',
+        cardBgColor: inputCardBgColor ? inputCardBgColor.value : '#ffffff',
         bodyGradientStart: (inputBodyGradientStart && inputBodyGradientStart.getAttribute('data-use-default') !== 'true') ? (inputBodyGradientStart.value || '') : '',
         bodyGradientEnd: (inputBodyGradientEnd && inputBodyGradientEnd.getAttribute('data-use-default') !== 'true') ? (inputBodyGradientEnd.value || '') : '',
         fontSize: inputFontSize ? inputFontSize.value : 'medium',
@@ -264,6 +271,7 @@
             openEditModal(tool);
           });
           cardsContainer.appendChild(wrap);
+          if (tool.cardColor && String(tool.cardColor).trim()) link.style.background = tool.cardColor.trim();
           if (fallbackUrl) {
             var iconImg = wrap.querySelector('.card-icon img');
             if (iconImg) {
@@ -283,6 +291,7 @@
           a.rel = 'noopener noreferrer';
           if (isPlugin) a.setAttribute('download', '');
           a.innerHTML = cardInner;
+          if (tool.cardColor && String(tool.cardColor).trim()) a.style.background = tool.cardColor.trim();
           cardsContainer.appendChild(a);
           if (fallbackUrl) {
             var iconImg = a.querySelector('.card-icon img');
@@ -310,6 +319,7 @@
           if (toolName) toolName.value = '';
           if (toolUrl) toolUrl.value = '';
           if (toolDescription) toolDescription.value = '';
+          if (toolCardColor) toolCardColor.value = '';
           if (toolIcon) toolIcon.value = '';
           if (toolIconFile) toolIconFile.value = '';
           if (toolIconPreview) toolIconPreview.classList.add('hidden');
@@ -337,6 +347,7 @@
       if (toolName) toolName.value = tool.name || '';
       if (toolUrl) toolUrl.value = tool.url || '';
       if (toolDescription) toolDescription.value = tool.description || '';
+      if (toolCardColor) toolCardColor.value = (tool.cardColor && String(tool.cardColor).trim()) ? tool.cardColor.trim() : '';
       var iconVal = (tool.icon && String(tool.icon).trim()) ? tool.icon.trim() : '';
       if (iconVal && iconVal.indexOf('data:') === 0) {
         uploadedIconDataUrl = iconVal;
@@ -551,6 +562,7 @@
           name: name,
           url: url,
           description: toolDescription ? toolDescription.value.trim() : '',
+          cardColor: (toolCardColor && toolCardColor.value.trim()) ? toolCardColor.value.trim() : '',
           icon: (uploadedIconDataUrl || (toolIcon && toolIcon.value.trim()) || '').trim(),
           type: (toolType && toolType.value === 'plugin') ? 'plugin' : 'link'
         }
@@ -572,6 +584,7 @@
             if (toolUrl) toolUrl.value = '';
             if (toolDescription) toolDescription.value = '';
             uploadedIconDataUrl = '';
+            if (toolCardColor) toolCardColor.value = '';
             if (toolIcon) toolIcon.value = '';
             if (toolIconFile) toolIconFile.value = '';
             if (toolIconPreview) toolIconPreview.classList.add('hidden');

@@ -97,6 +97,7 @@ module.exports = async (req, res) => {
         name: String(tool.name).trim(),
         url: String(tool.url).trim(),
         description: (tool.description && String(tool.description).trim()) || '',
+        cardColor: (tool.cardColor && String(tool.cardColor).trim()) ? String(tool.cardColor).trim() : '',
         icon: (tool.icon && String(tool.icon).trim()) || '',
         type: (tool.type === 'plugin' ? 'plugin' : 'link')
       };
@@ -117,6 +118,7 @@ module.exports = async (req, res) => {
       name: String(tool.name).trim(),
       url: String(tool.url).trim(),
       description: (tool.description && String(tool.description).trim()) || '',
+      cardColor: (tool.cardColor && String(tool.cardColor).trim()) ? String(tool.cardColor).trim() : '',
       icon: (tool.icon && String(tool.icon).trim()) || '',
       type: (tool.type === 'plugin' ? 'plugin' : 'link')
     };
