@@ -47,6 +47,19 @@
         <input type="color" id="inputPrimaryColor" value="#e6a700" title="標題列與背景裝飾">
         <label>按鈕顏色</label>
         <input type="color" id="inputButtonColor" value="#e6a700" title="按鈕與卡片圖示">
+        <label>大畫面漸層</label>
+        <p class="form-hint">主內容區的漸層色，留空則使用上方主題色</p>
+        <div class="settings-row two-col">
+          <div>
+            <label class="label-inline">起色</label>
+            <input type="color" id="inputBodyGradientStart" value="#e6a700" data-use-default="true" title="漸層起色（清除＝使用主題色）">
+          </div>
+          <div>
+            <label class="label-inline">迄色</label>
+            <input type="color" id="inputBodyGradientEnd" value="#d49800" data-use-default="true" title="漸層迄色">
+          </div>
+        </div>
+        <button type="button" class="btn btn-text" id="clearBodyGradientBtn">清除自訂漸層</button>
         <label>頁面背景圖</label>
         <input type="url" id="inputBackgroundUrl" placeholder="圖片網址（選填）">
         <div class="settings-upload-row">
@@ -121,6 +134,31 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- 許願池：右下角客服圖像 + 氣泡 -->
+  <div class="wish-pool-widget" id="wishPoolWidget" aria-label="許願池">
+    <div class="wish-pool-bubble">許願池</div>
+    <div class="wish-pool-avatar-wrap">
+      <span class="wish-pool-badge hidden" id="wishPoolBadge">0</span>
+      <div class="wish-pool-avatar" id="wishPoolAvatar">👩‍💼</div>
+    </div>
+  </div>
+  <div class="wish-pool-panel hidden" id="wishPoolPanel">
+    <div class="wish-pool-panel-header">
+      <h3>許願池</h3>
+      <button type="button" class="wish-pool-close" id="wishPoolClose">&times;</button>
+    </div>
+    <div class="wish-pool-submit-view" id="wishPoolSubmitView">
+      <p class="wish-pool-hint">寫下你的想法或建議，我們會盡快處理～</p>
+      <textarea id="wishPoolContent" placeholder="輸入許願內容..." rows="3"></textarea>
+      <button type="button" class="btn btn-primary" id="wishPoolSubmit">送出</button>
+      <p class="wish-pool-msg hidden" id="wishPoolMsg"></p>
+    </div>
+    <div class="wish-pool-admin-view hidden" id="wishPoolAdminView">
+      <p class="wish-pool-admin-hint">共 <span id="wishPoolCount">0</span> 則許願</p>
+      <div class="wish-pool-list" id="wishPoolList"></div>
     </div>
   </div>
 

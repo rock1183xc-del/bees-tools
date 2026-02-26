@@ -15,6 +15,9 @@
     const saveSettings = document.getElementById('saveSettings');
     const inputPrimaryColor = document.getElementById('inputPrimaryColor');
     const inputButtonColor = document.getElementById('inputButtonColor');
+    const inputBodyGradientStart = document.getElementById('inputBodyGradientStart');
+    const inputBodyGradientEnd = document.getElementById('inputBodyGradientEnd');
+    const clearBodyGradientBtn = document.getElementById('clearBodyGradientBtn');
     const inputBackgroundUrl = document.getElementById('inputBackgroundUrl');
     const inputBackgroundFile = document.getElementById('inputBackgroundFile');
     const clearBackgroundBtn = document.getElementById('clearBackgroundBtn');
@@ -37,12 +40,24 @@
     const adminVerifyBtn = document.getElementById('adminVerifyBtn');
     const modalAdminTitle = document.getElementById('modalAdminTitle');
     const modalAdminSubtitle = document.getElementById('modalAdminSubtitle');
+    const wishPoolWidget = document.getElementById('wishPoolWidget');
+    const wishPoolPanel = document.getElementById('wishPoolPanel');
+    const wishPoolBadge = document.getElementById('wishPoolBadge');
+    const wishPoolClose = document.getElementById('wishPoolClose');
+    const wishPoolSubmitView = document.getElementById('wishPoolSubmitView');
+    const wishPoolAdminView = document.getElementById('wishPoolAdminView');
+    const wishPoolContent = document.getElementById('wishPoolContent');
+    const wishPoolSubmit = document.getElementById('wishPoolSubmit');
+    const wishPoolMsg = document.getElementById('wishPoolMsg');
+    const wishPoolList = document.getElementById('wishPoolList');
+    const wishPoolCount = document.getElementById('wishPoolCount');
 
     if (!cardsContainer || !btnSettings || !btnAdmin || !modalSettings || !modalAdmin) return;
 
     var currentTools = [];
     var adminMode = false;
     var storedAdminPassword = '';
+    var editingToolId = '';
 
     function updateToolTypeHint() {
       if (!toolTypeHint || !labelToolUrl) return;
@@ -66,6 +81,13 @@
       if (theme.buttonColor) {
         root.style.setProperty('--button-color', theme.buttonColor);
         root.style.setProperty('--button-color-hover', theme.buttonColorHover || theme.buttonColor);
+      }
+      var start = theme.bodyGradientStart && theme.bodyGradientStart.trim();
+      var end = theme.bodyGradientEnd && theme.bodyGradientEnd.trim();
+      if (start && end) {
+        root.style.setProperty('--body-pattern', 'linear-gradient(135deg, color-mix(in srgb, ' + start + ' 28%, transparent) 0%, color-mix(in srgb, ' + end + ' 12%, transparent) 100%)');
+      } else {
+        root.style.setProperty('--body-pattern', 'radial-gradient(ellipse at top, color-mix(in srgb, var(--primary) 22%, transparent) 0%, transparent 55%)');
       }
       if (theme.backgroundImage) {
         document.body.style.backgroundImage = 'linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.85)), url(' + theme.backgroundImage + ')';
@@ -93,6 +115,19 @@
         applyTheme(theme);
         if (theme && inputPrimaryColor) inputPrimaryColor.value = theme.primaryColor || '#e6a700';
         if (theme && inputButtonColor) inputButtonColor.value = theme.buttonColor || '#e6a700';
+        if (inputBodyGradientStart && inputBodyGradientEnd) {
+          if (theme && theme.bodyGradientStart && theme.bodyGradientEnd) {
+            inputBodyGradientStart.value = theme.bodyGradientStart;
+            inputBodyGradientEnd.value = theme.bodyGradientEnd;
+            inputBodyGradientStart.removeAttribute('data-use-default');
+            inputBodyGradientEnd.removeAttribute('data-use-default');
+          } else {
+            inputBodyGradientStart.value = '#e6a700';
+            inputBodyGradientEnd.value = '#d49800';
+            inputBodyGradientStart.setAttribute('data-use-default', 'true');
+            inputBodyGradientEnd.setAttribute('data-use-default', 'true');
+          }
+        }
         if (theme && inputBackgroundUrl) {
           var bg = theme.backgroundImage || '';
           inputBackgroundUrl.value = (bg && bg.indexOf('http') === 0) ? bg : '';
@@ -108,6 +143,8 @@
       var theme = {
         primaryColor: inputPrimaryColor ? inputPrimaryColor.value : '#e6a700',
         buttonColor: inputButtonColor ? inputButtonColor.value : '#e6a700',
+        bodyGradientStart: (inputBodyGradientStart && inputBodyGradientStart.getAttribute('data-use-default') !== 'true') ? (inputBodyGradientStart.value || '') : '',
+        bodyGradientEnd: (inputBodyGradientEnd && inputBodyGradientEnd.getAttribute('data-use-default') !== 'true') ? (inputBodyGradientEnd.value || '') : '',
         fontSize: inputFontSize ? inputFontSize.value : 'medium',
         cardSpacing: inputCardSpacing ? inputCardSpacing.value : 'normal',
         cardRadius: inputCardRadius ? inputCardRadius.value : 'medium'
@@ -181,7 +218,7 @@
           wrap.className = 'card-outer';
           wrap.innerHTML =
             '<button type="button" class="card-delete" data-tool-id="' + escapeHtml(tool.id) + '" aria-label="刪除 ' + escapeHtml(tool.name) + '">&times;</button>' +
-            '<a class="card' + (isPlugin ? ' card--plugin' : '') + '" href="' + escapeHtml(tool.url) + '" target="_blank" rel="noopener noreferrer"' + (isPlugin ? ' download' : '') + '>' + cardInner + '</a>';
+            '<a class="card' + (isPlugin ? ' card--plugin' : '') + '" href="' + escapeHtml(tool.url) + '" target="_blank" rel="noopener noreferrer"' + (isPlugin ? ' download' : '') + ' data-tool-id="' + escapeHtml(tool.id) + '">' + cardInner + '</a>';
           var link = wrap.querySelector('a');
           var delBtn = wrap.querySelector('.card-delete');
           if (delBtn) {
@@ -200,6 +237,11 @@
                 .catch(function () {});
             });
           }
+          link.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openEditModal(tool);
+          });
           cardsContainer.appendChild(wrap);
         } else {
           var a = document.createElement('a');
@@ -220,6 +262,7 @@
         addCard.setAttribute('aria-label', '新增工具');
         addCard.innerHTML = '<span class="card-add-icon">+</span>';
         addCard.addEventListener('click', function () {
+          editingToolId = '';
           if (toolName) toolName.value = '';
           if (toolUrl) toolUrl.value = '';
           if (toolDescription) toolDescription.value = '';
@@ -231,6 +274,7 @@
           if (adminAddView) { adminAddView.classList.remove('hidden'); }
           if (modalAdminTitle) modalAdminTitle.textContent = '新增工具';
           if (modalAdminSubtitle) modalAdminSubtitle.classList.remove('hidden');
+          if (submitTool) submitTool.textContent = '新增';
           openModal(modalAdmin);
         });
         cardsContainer.appendChild(addCard);
@@ -239,6 +283,23 @@
 
     function updateAdminButtonText() {
       if (btnAdmin) btnAdmin.textContent = adminMode ? '結束管理' : '管理者';
+    }
+
+    function openEditModal(tool) {
+      editingToolId = tool.id;
+      if (toolName) toolName.value = tool.name || '';
+      if (toolUrl) toolUrl.value = tool.url || '';
+      if (toolDescription) toolDescription.value = tool.description || '';
+      if (toolIcon) toolIcon.value = tool.icon || '';
+      if (toolType) toolType.value = (tool.type === 'plugin') ? 'plugin' : 'link';
+      updateToolTypeHint();
+      if (adminMessageAdd) { adminMessageAdd.textContent = ''; adminMessageAdd.classList.add('hidden'); }
+      if (adminVerifyView) adminVerifyView.classList.add('hidden');
+      if (adminAddView) { adminAddView.classList.remove('hidden'); }
+      if (modalAdminTitle) modalAdminTitle.textContent = '編輯工具';
+      if (modalAdminSubtitle) modalAdminSubtitle.classList.add('hidden');
+      if (submitTool) submitTool.textContent = '儲存';
+      openModal(modalAdmin);
     }
 
     function escapeHtml(s) {
@@ -303,6 +364,20 @@
       saveTheme();
       closeModal(modalSettings);
     });
+    if (clearBodyGradientBtn) clearBodyGradientBtn.addEventListener('click', function () {
+      if (inputBodyGradientStart) { inputBodyGradientStart.value = '#e6a700'; inputBodyGradientStart.setAttribute('data-use-default', 'true'); }
+      if (inputBodyGradientEnd) { inputBodyGradientEnd.value = '#d49800'; inputBodyGradientEnd.setAttribute('data-use-default', 'true'); }
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        var theme = raw ? JSON.parse(raw) : {};
+        theme.bodyGradientStart = '';
+        theme.bodyGradientEnd = '';
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
+        applyTheme(theme);
+      } catch (e) {}
+    });
+    if (inputBodyGradientStart) inputBodyGradientStart.addEventListener('input', function () { inputBodyGradientStart.removeAttribute('data-use-default'); if (inputBodyGradientEnd) inputBodyGradientEnd.removeAttribute('data-use-default'); });
+    if (inputBodyGradientEnd) inputBodyGradientEnd.addEventListener('input', function () { inputBodyGradientEnd.removeAttribute('data-use-default'); if (inputBodyGradientStart) inputBodyGradientStart.removeAttribute('data-use-default'); });
     if (clearBackgroundBtn) clearBackgroundBtn.addEventListener('click', function () {
       if (inputBackgroundUrl) inputBackgroundUrl.value = '';
       if (inputBackgroundFile) inputBackgroundFile.value = '';
@@ -352,6 +427,7 @@
             updateAdminButtonText();
             closeModal(modalAdmin);
             fetchTools();
+            fetchWishesCount();
           } else {
             showAdminMessage(data.error || '密碼錯誤', true);
           }
@@ -384,30 +460,38 @@
         return;
       }
       if (adminMessageAdd) adminMessageAdd.classList.add('hidden');
+      var isEdit = !!editingToolId;
+      var body = {
+        password: password,
+        tool: {
+          name: name,
+          url: url,
+          description: toolDescription ? toolDescription.value.trim() : '',
+          icon: toolIcon ? toolIcon.value.trim() : '',
+          type: (toolType && toolType.value === 'plugin') ? 'plugin' : 'link'
+        }
+      };
+      if (isEdit) {
+        body.action = 'update';
+        body.id = editingToolId;
+      }
       fetch(API_BASE + '/api/tools', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          password: password,
-          tool: {
-            name: name,
-            url: url,
-            description: toolDescription ? toolDescription.value.trim() : '',
-            icon: toolIcon ? toolIcon.value.trim() : '',
-            type: (toolType && toolType.value === 'plugin') ? 'plugin' : 'link'
-          }
-        })
+        body: JSON.stringify(body)
       })
         .then(function (res) { return res.json().then(function (data) {
           if (res.ok) {
-            if (adminMessageAdd) { adminMessageAdd.textContent = '新增成功！'; adminMessageAdd.classList.remove('hidden', 'error'); adminMessageAdd.classList.add('success'); }
+            if (adminMessageAdd) { adminMessageAdd.textContent = isEdit ? '已儲存！' : '新增成功！'; adminMessageAdd.classList.remove('hidden', 'error'); adminMessageAdd.classList.add('success'); }
+            editingToolId = '';
             if (toolName) toolName.value = '';
             if (toolUrl) toolUrl.value = '';
             if (toolDescription) toolDescription.value = '';
             if (toolIcon) toolIcon.value = '';
             fetchTools();
+            closeModal(modalAdmin);
           } else {
-            if (adminMessageAdd) { adminMessageAdd.textContent = data.error || '新增失敗'; adminMessageAdd.classList.remove('hidden', 'success'); adminMessageAdd.classList.add('error'); }
+            if (adminMessageAdd) { adminMessageAdd.textContent = data.error || (isEdit ? '儲存失敗' : '新增失敗'); adminMessageAdd.classList.remove('hidden', 'success'); adminMessageAdd.classList.add('error'); }
           }
         }); })
         .catch(function (err) {
@@ -419,8 +503,120 @@
       if (e.target === modalAdmin) closeModal(modalAdmin);
     });
 
+    function fetchWishesCount() {
+      fetch(API_BASE + '/api/wishes')
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          var n = data.pendingCount || 0;
+          if (wishPoolBadge) {
+            wishPoolBadge.textContent = n;
+            wishPoolBadge.classList.toggle('hidden', n === 0);
+          }
+        })
+        .catch(function () {});
+    }
+
+    function openWishPanel() {
+      if (!wishPoolPanel) return;
+      wishPoolPanel.classList.remove('hidden');
+      if (adminMode && storedAdminPassword) {
+        if (wishPoolSubmitView) wishPoolSubmitView.classList.add('hidden');
+        if (wishPoolAdminView) wishPoolAdminView.classList.remove('hidden');
+        fetch(API_BASE + '/api/wishes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: storedAdminPassword, action: 'list' })
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (wishPoolCount) wishPoolCount.textContent = (data.list && data.list.length) || 0;
+            renderWishList(data.list || []);
+          })
+          .catch(function () { if (wishPoolList) wishPoolList.innerHTML = '<p class="wish-pool-empty">無法載入</p>'; });
+      } else {
+        if (wishPoolAdminView) wishPoolAdminView.classList.add('hidden');
+        if (wishPoolSubmitView) wishPoolSubmitView.classList.remove('hidden');
+        if (wishPoolContent) wishPoolContent.value = '';
+        if (wishPoolMsg) { wishPoolMsg.textContent = ''; wishPoolMsg.classList.add('hidden'); }
+      }
+    }
+
+    function closeWishPanel() {
+      if (wishPoolPanel) wishPoolPanel.classList.add('hidden');
+    }
+
+    function renderWishList(list) {
+      if (!wishPoolList) return;
+      wishPoolList.innerHTML = '';
+      if (!list || list.length === 0) {
+        wishPoolList.innerHTML = '<p class="wish-pool-empty">尚無許願</p>';
+        return;
+      }
+      list.forEach(function (w) {
+        var row = document.createElement('div');
+        row.className = 'wish-pool-item';
+        var statusLabel = { pending: '待處理', processing: '處理中', done: '已完成' }[w.status] || w.status;
+        row.innerHTML =
+          '<p class="wish-pool-item-content">' + escapeHtml(w.content) + '</p>' +
+          '<div class="wish-pool-item-meta">' +
+          '<select class="wish-pool-status" data-wish-id="' + escapeHtml(w.id) + '">' +
+          '<option value="pending"' + (w.status === 'pending' ? ' selected' : '') + '>待處理</option>' +
+          '<option value="processing"' + (w.status === 'processing' ? ' selected' : '') + '>處理中</option>' +
+          '<option value="done"' + (w.status === 'done' ? ' selected' : '') + '>已完成</option>' +
+          '</select>' +
+          '</div>';
+        wishPoolList.appendChild(row);
+        var sel = row.querySelector('.wish-pool-status');
+        if (sel) sel.addEventListener('change', function () {
+          var id = sel.getAttribute('data-wish-id');
+          var status = sel.value;
+          fetch(API_BASE + '/api/wishes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: storedAdminPassword, action: 'updateStatus', id: id, status: status })
+          })
+            .then(function (res) { return res.json(); })
+            .then(function () { fetchWishesCount(); });
+        });
+      });
+    }
+
+    if (wishPoolWidget) wishPoolWidget.addEventListener('click', function () {
+      if (wishPoolPanel && wishPoolPanel.classList.contains('hidden')) openWishPanel();
+      else closeWishPanel();
+    });
+    if (wishPoolClose) wishPoolClose.addEventListener('click', closeWishPanel);
+    if (wishPoolSubmit && wishPoolContent) wishPoolSubmit.addEventListener('click', function () {
+      var content = wishPoolContent.value.trim();
+      if (!content) {
+        if (wishPoolMsg) { wishPoolMsg.textContent = '請輸入內容'; wishPoolMsg.classList.remove('hidden'); wishPoolMsg.classList.add('error'); }
+        return;
+      }
+      if (wishPoolMsg) wishPoolMsg.classList.add('hidden');
+      fetch(API_BASE + '/api/wishes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.id) {
+            if (wishPoolMsg) { wishPoolMsg.textContent = '已送出，謝謝你的許願～'; wishPoolMsg.classList.remove('hidden', 'error'); wishPoolMsg.classList.add('success'); }
+            wishPoolContent.value = '';
+          } else if (data.error && wishPoolMsg) {
+            wishPoolMsg.textContent = data.error;
+            wishPoolMsg.classList.remove('hidden', 'success');
+            wishPoolMsg.classList.add('error');
+          }
+        })
+        .catch(function () {
+          if (wishPoolMsg) { wishPoolMsg.textContent = '無法送出，請稍後再試'; wishPoolMsg.classList.remove('hidden', 'success'); wishPoolMsg.classList.add('error'); }
+        });
+    });
+
     loadTheme();
     fetchTools();
+    fetchWishesCount();
   }
 
   if (document.readyState === 'loading') {

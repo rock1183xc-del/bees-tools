@@ -11,7 +11,9 @@ app.use(express.json());
 
 if (isVercel) {
   const apiTools = require('./api/tools.js');
+  const apiWishes = require('./api/wishes.js');
   app.all('/api/tools', (req, res) => apiTools(req, res));
+  app.all('/api/wishes', (req, res) => apiWishes(req, res));
   app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
   app.get('/favicon.svg', (req, res) => res.sendFile(path.join(__dirname, 'favicon.svg')));
   app.get('/css/style.css', (req, res) => res.sendFile(path.join(__dirname, 'css', 'style.css')));

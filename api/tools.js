@@ -82,6 +82,28 @@ module.exports = async (req, res) => {
       return res.status(200).json({ ok: true });
     }
 
+    if (action === 'update') {
+      const id = req.body?.id;
+      const tool = req.body?.tool;
+      if (!id || typeof id !== 'string' || !tool || !tool.name || !tool.url) {
+        return res.status(400).json({ error: '請提供要更新的工具 id 與內容' });
+      }
+      let tools = await getTools(redis);
+      if (!tools || !Array.isArray(tools)) tools = [...DEFAULT_TOOLS];
+      const idx = tools.findIndex(function (t) { return t.id === id; });
+      if (idx === -1) return res.status(404).json({ error: '找不到該工具' });
+      tools[idx] = {
+        id: tools[idx].id,
+        name: String(tool.name).trim(),
+        url: String(tool.url).trim(),
+        description: (tool.description && String(tool.description).trim()) || '',
+        icon: (tool.icon && String(tool.icon).trim()) || '',
+        type: (tool.type === 'plugin' ? 'plugin' : 'link')
+      };
+      await setTools(redis, tools);
+      return res.status(200).json(tools[idx]);
+    }
+
     const tool = req.body?.tool;
     if (!tool || !tool.name || !tool.url) {
       return res.status(400).json({ error: '請提供工具名稱與網址' });

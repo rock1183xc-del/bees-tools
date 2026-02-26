@@ -8,8 +8,8 @@
   /* 標題列：用主題色的深色版 */
   --header-gradient: linear-gradient(135deg, color-mix(in srgb, var(--primary) 35%, #000) 0%, color-mix(in srgb, var(--primary) 22%, #000) 100%);
   --body-bg: #f0f2f5;
-  /* 背景裝飾：用主題色淡色 */
-  --body-pattern: radial-gradient(ellipse at top, color-mix(in srgb, var(--primary) 12%, transparent) 0%, transparent 55%);
+  /* 大畫面漸層：預設用主題色，可見度提高（約 22%）；或由介面設定改為自訂起迄色 */
+  --body-pattern: radial-gradient(ellipse at top, color-mix(in srgb, var(--primary) 22%, transparent) 0%, transparent 55%);
   --card-bg: #ffffff;
   --card-border: rgba(0, 0, 0, 0.06);
   --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
@@ -409,6 +409,29 @@ body {
   cursor: pointer;
 }
 
+.settings-row.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+}
+
+.settings-row.two-col .label-inline {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.settings-row.two-col input[type="color"] {
+  width: 100%;
+  height: 40px;
+  padding: 4px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 .settings-upload-row {
   display: flex;
   align-items: center;
@@ -507,6 +530,202 @@ body {
 
 .btn-delete:hover {
   background: rgba(197, 48, 48, 0.1);
+}
+
+/* 許願池：右下角浮動客服 */
+.wish-pool-widget {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 15;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.wish-pool-bubble {
+  background: var(--card-bg);
+  color: var(--text);
+  padding: 0.4rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+  white-space: nowrap;
+}
+
+.wish-pool-avatar-wrap {
+  position: relative;
+}
+
+.wish-pool-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: #c53030;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wish-pool-badge.hidden {
+  display: none;
+}
+
+.wish-pool-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--button-color) 0%, var(--button-color-hover) 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.wish-pool-widget:hover .wish-pool-avatar {
+  transform: scale(1.05);
+}
+
+.wish-pool-panel {
+  position: fixed;
+  bottom: 5rem;
+  right: 1.5rem;
+  z-index: 16;
+  width: 320px;
+  max-width: calc(100vw - 2rem);
+  max-height: 70vh;
+  background: var(--card-bg);
+  border-radius: var(--radius-modal);
+  box-shadow: var(--card-shadow-hover);
+  border: 1px solid var(--card-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.wish-pool-panel.hidden {
+  display: none !important;
+}
+
+.wish-pool-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--card-border);
+  background: #fafafa;
+}
+
+.wish-pool-panel-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.wish-pool-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+}
+
+.wish-pool-submit-view,
+.wish-pool-admin-view {
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.wish-pool-hint,
+.wish-pool-admin-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.wish-pool-submit-view textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-btn);
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 0.75rem;
+}
+
+.wish-pool-msg {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+}
+
+.wish-pool-msg.success {
+  color: #2f855a;
+}
+
+.wish-pool-msg.error {
+  color: #c53030;
+}
+
+.wish-pool-list {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.wish-pool-empty {
+  margin: 0;
+  padding: 1rem 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.wish-pool-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.wish-pool-item:last-child {
+  border-bottom: none;
+}
+
+.wish-pool-item-content {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.wish-pool-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wish-pool-status {
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
 }
 
 /* Font size variants */

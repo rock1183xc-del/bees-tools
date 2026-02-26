@@ -1,9 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "api/tools.js": {
-      "memory": 128,
-      "maxDuration": 10
-    }
+    "api/tools.js": { "memory": 128, "maxDuration": 10 },
+    "api/wishes.js": { "memory": 128, "maxDuration": 10 }
   }
 }
