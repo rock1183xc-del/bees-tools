@@ -4,8 +4,7 @@
   "description": "我愛里蜂群好用工具集錦",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "vercel-build": "echo 'Static + API'"
+    "dev": "node server.js"
   },
   "dependencies": {
     "@upstash/redis": "^1.28.0",
