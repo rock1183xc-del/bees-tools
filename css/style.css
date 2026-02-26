@@ -110,11 +110,16 @@ body {
   box-shadow: 0 4px 12px rgba(230, 167, 0, 0.4);
 }
 
-/* Main */
+/* Main：一進來就以「標題 + 工具卡片」為主 */
 .main {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1.75rem 1.5rem;
+  min-height: 40vh;
+}
+
+.main .loading {
+  margin: 0 0 1rem;
 }
 
 .cards-container {
@@ -203,6 +208,13 @@ body {
   display: none !important;
 }
 
+/* 確保 Modal 預設不佔版面、不顯示 */
+.modal.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 /* Modal */
 .modal {
   position: fixed;
@@ -242,6 +254,13 @@ body {
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text);
+}
+
+.modal-subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-muted);
 }
 
 .modal-close {

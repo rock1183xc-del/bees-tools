@@ -12,22 +12,22 @@
 <body>
   <header class="header">
     <h1 class="title">我愛里蜂群好用工具集錦</h1>
-    <div class="header-actions">
-      <button type="button" class="btn btn-settings" id="btnSettings">設定</button>
+    <nav class="header-actions" aria-label="功能選單">
+      <button type="button" class="btn btn-settings" id="btnSettings">介面設定</button>
       <button type="button" class="btn btn-admin" id="btnAdmin">管理者</button>
-    </div>
+    </nav>
   </header>
 
-  <main class="main">
+  <main class="main" id="mainContent">
+    <p class="loading" id="loading">載入中…</p>
+    <p class="error hidden" id="error"></p>
     <div class="cards-container" id="cardsContainer">
       <!-- 卡片由 JS 動態產生 -->
     </div>
-    <p class="loading" id="loading">載入中…</p>
-    <p class="error hidden" id="error"></p>
   </main>
 
-  <!-- 外觀設定 Modal -->
-  <div class="modal hidden" id="modalSettings">
+  <!-- 介面設定 Modal（一般使用者） -->
+  <div class="modal hidden" id="modalSettings" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-header">
         <h2>外觀設定</h2>
@@ -61,11 +61,14 @@
     </div>
   </div>
 
-  <!-- 管理者 Modal -->
-  <div class="modal hidden" id="modalAdmin">
+  <!-- 管理者 Modal（新增/編輯工具卡片） -->
+  <div class="modal hidden" id="modalAdmin" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>新增工具</h2>
+        <div>
+          <h2>管理工具</h2>
+          <p class="modal-subtitle">新增或編輯工具卡片</p>
+        </div>
         <button type="button" class="modal-close" id="closeAdmin">&times;</button>
       </div>
       <div class="modal-body">

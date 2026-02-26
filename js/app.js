@@ -124,6 +124,7 @@
     function fetchTools() {
       showLoading(true);
       showError('');
+      if (cardsContainer) cardsContainer.innerHTML = '';
       fetch(API_BASE + '/api/tools')
         .then(function (res) { return res.json(); })
         .then(function (data) {
@@ -132,17 +133,25 @@
         })
         .catch(function (err) {
           showLoading(false);
-          showError('無法載入工具列表：' + (err.message || '請確認後端已啟動'));
-          renderCards([]);
+          showError('無法載入工具列表，請稍後再試。');
+          if (cardsContainer) cardsContainer.innerHTML = '<p class="loading">尚無工具，請由管理者新增。</p>';
         });
     }
 
     function openModal(modal) {
-      if (modal) modal.classList.remove('hidden');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      var main = document.getElementById('mainContent');
+      if (main) main.setAttribute('aria-hidden', 'true');
     }
 
     function closeModal(modal) {
-      if (modal) modal.classList.add('hidden');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+      var main = document.getElementById('mainContent');
+      if (main) main.setAttribute('aria-hidden', 'false');
     }
 
     function showAdminMessage(text, isError) {
