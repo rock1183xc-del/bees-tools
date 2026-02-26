@@ -36,6 +36,21 @@ app.post('/api/tools', (req, res) => {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return res.status(500).json({ error: '伺服器未設定管理者密碼' });
   if (password !== adminPassword) return res.status(403).json({ error: '密碼錯誤' });
+
+  if (req.body.action === 'verify') {
+    return res.status(200).json({ ok: true });
+  }
+
+  if (req.body.action === 'delete') {
+    const id = req.body.id;
+    if (!id || typeof id !== 'string') return res.status(400).json({ error: '請提供要刪除的工具 id' });
+    const original = readTools();
+    const tools = original.filter(function (t) { return t.id !== id; });
+    if (tools.length === original.length) return res.status(404).json({ error: '找不到該工具' });
+    writeTools(tools);
+    return res.status(200).json({ ok: true });
+  }
+
   const tool = req.body.tool;
   if (!tool || !tool.name || !tool.url) return res.status(400).json({ error: '請提供工具名稱與網址' });
   const tools = readTools();

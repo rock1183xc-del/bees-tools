@@ -60,6 +60,28 @@ module.exports = async (req, res) => {
       return res.status(403).json({ error: '密碼錯誤' });
     }
 
+    const action = req.body?.action;
+
+    if (action === 'verify') {
+      return res.status(200).json({ ok: true });
+    }
+
+    if (action === 'delete') {
+      const id = req.body?.id;
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ error: '請提供要刪除的工具 id' });
+      }
+      let tools = await getTools(redis);
+      if (!tools || !Array.isArray(tools)) tools = [...DEFAULT_TOOLS];
+      const before = tools.length;
+      tools = tools.filter(function (t) { return t.id !== id; });
+      if (tools.length === before) {
+        return res.status(404).json({ error: '找不到該工具' });
+      }
+      await setTools(redis, tools);
+      return res.status(200).json({ ok: true });
+    }
+
     const tool = req.body?.tool;
     if (!tool || !tool.name || !tool.url) {
       return res.status(400).json({ error: '請提供工具名稱與網址' });
