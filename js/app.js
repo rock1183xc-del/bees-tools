@@ -62,8 +62,14 @@
     const wishPoolMsg = document.getElementById('wishPoolMsg');
     const wishPoolList = document.getElementById('wishPoolList');
     const wishPoolCount = document.getElementById('wishPoolCount');
+    const errorWrap = document.getElementById('errorWrap');
+    const errorRetry = document.getElementById('errorRetry');
+    const settingsSaveMsg = document.getElementById('settingsSaveMsg');
 
     if (!cardsContainer || !btnSettings || !btnAdmin || !modalSettings || !modalAdmin) return;
+
+    var currentModalTrigger = null;
+    var currentEscHandler = null;
 
     var currentTools = [];
     var adminMode = false;
@@ -250,15 +256,27 @@
         var fr = new FileReader();
         fr.onload = function () {
           theme.backgroundImage = fr.result;
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
-          applyTheme(theme);
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
+            applyTheme(theme);
+            if (settingsSaveMsg) { settingsSaveMsg.textContent = '已儲存'; settingsSaveMsg.classList.remove('hidden'); }
+          } catch (err) {
+            if (settingsSaveMsg) { settingsSaveMsg.textContent = '儲存失敗，可能是設定資料過大'; settingsSaveMsg.classList.remove('hidden'); }
+          }
         };
         fr.readAsDataURL(inputBackgroundFile.files[0]);
         return;
       }
       theme.backgroundImage = (inputBackgroundUrl && inputBackgroundUrl.value.trim()) ? inputBackgroundUrl.value.trim() : '';
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
-      applyTheme(theme);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
+        applyTheme(theme);
+        if (settingsSaveMsg) { settingsSaveMsg.textContent = '已儲存'; settingsSaveMsg.classList.remove('hidden'); }
+        return true;
+      } catch (err) {
+        if (settingsSaveMsg) { settingsSaveMsg.textContent = '儲存失敗，可能是設定資料過大'; settingsSaveMsg.classList.remove('hidden'); }
+        return false;
+      }
     }
 
     function showLoading(show) {
@@ -266,10 +284,8 @@
     }
 
     function showError(msg) {
-      if (errorEl) {
-        errorEl.textContent = msg || '';
-        errorEl.classList.toggle('hidden', !msg);
-      }
+      if (errorEl) errorEl.textContent = msg || '';
+      if (errorWrap) errorWrap.classList.toggle('hidden', !msg);
     }
 
     function getFaviconUrl(url) {
@@ -337,21 +353,30 @@
               e.preventDefault();
               e.stopPropagation();
               var id = delBtn.getAttribute('data-tool-id');
+              var name = (tool && tool.name) ? tool.name : '此工具';
+              if (!confirm('確定要刪除「' + name + '」嗎？')) return;
               fetch(API_BASE + '/api/tools', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: storedAdminPassword, action: 'delete', id: id })
               })
                 .then(function (res) { return res.json().then(function (data) {
-                  if (res.ok) fetchTools();
+                  if (res.ok) {
+                    showError('');
+                    fetchTools();
+                  } else {
+                    showError(data.error || '刪除失敗，請稍後再試');
+                  }
                 }); })
-                .catch(function () {});
+                .catch(function () {
+                  showError('無法連線，刪除失敗');
+                });
             });
           }
           link.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            openEditModal(tool);
+            openEditModal(tool, link);
           });
           cardsContainer.appendChild(wrap);
           if (tool.cardColor && String(tool.cardColor).trim()) link.style.background = tool.cardColor.trim();
@@ -415,7 +440,7 @@
           if (modalAdminTitle) modalAdminTitle.textContent = '新增工具';
           if (modalAdminSubtitle) modalAdminSubtitle.classList.remove('hidden');
           if (submitTool) submitTool.textContent = '新增';
-          openModal(modalAdmin);
+          openModal(modalAdmin, addCard);
         });
         cardsContainer.appendChild(addCard);
       }
@@ -425,7 +450,7 @@
       if (btnAdmin) btnAdmin.textContent = adminMode ? '結束管理' : '管理者';
     }
 
-    function openEditModal(tool) {
+    function openEditModal(tool, triggerEl) {
       editingToolId = tool.id;
       if (toolName) toolName.value = tool.name || '';
       if (toolUrl) toolUrl.value = tool.url || '';
@@ -453,7 +478,7 @@
       if (modalAdminTitle) modalAdminTitle.textContent = '編輯工具';
       if (modalAdminSubtitle) modalAdminSubtitle.classList.add('hidden');
       if (submitTool) submitTool.textContent = '儲存';
-      openModal(modalAdmin);
+      openModal(modalAdmin, triggerEl || null);
     }
 
     function escapeHtml(s) {
@@ -478,13 +503,31 @@
         .catch(function (err) {
           showLoading(false);
           showError('無法載入工具列表，請稍後再試。');
-          if (cardsContainer) cardsContainer.innerHTML = '<p class="loading">尚無工具，請由管理者新增。</p>';
+          if (cardsContainer) cardsContainer.innerHTML = '';
           currentTools = [];
         });
     }
 
-    function openModal(modal) {
+    if (errorRetry) errorRetry.addEventListener('click', function () {
+      showError('');
+      fetchTools();
+    });
+
+    function openModal(modal, triggerEl) {
       if (!modal) return;
+      currentModalTrigger = triggerEl || null;
+      if (currentEscHandler) {
+        document.removeEventListener('keydown', currentEscHandler);
+        currentEscHandler = null;
+      }
+      currentEscHandler = function (e) {
+        if (e.key === 'Escape') {
+          document.removeEventListener('keydown', currentEscHandler);
+          currentEscHandler = null;
+          closeModal(modal);
+        }
+      };
+      document.addEventListener('keydown', currentEscHandler);
       modal.classList.remove('hidden');
       modal.setAttribute('aria-hidden', 'false');
       var main = document.getElementById('mainContent');
@@ -493,10 +536,18 @@
 
     function closeModal(modal) {
       if (!modal) return;
+      if (currentEscHandler) {
+        document.removeEventListener('keydown', currentEscHandler);
+        currentEscHandler = null;
+      }
       modal.classList.add('hidden');
       modal.setAttribute('aria-hidden', 'true');
       var main = document.getElementById('mainContent');
       if (main) main.setAttribute('aria-hidden', 'false');
+      if (currentModalTrigger && typeof currentModalTrigger.focus === 'function') {
+        try { currentModalTrigger.focus(); } catch (err) {}
+      }
+      currentModalTrigger = null;
     }
 
     function showAdminMessage(text, isError) {
@@ -512,11 +563,13 @@
       if (adminMessage) adminMessage.classList.add('hidden');
     }
 
-    btnSettings.addEventListener('click', function () { openModal(modalSettings); });
+    btnSettings.addEventListener('click', function () { openModal(modalSettings, btnSettings); });
     if (closeSettings) closeSettings.addEventListener('click', function () { closeModal(modalSettings); });
     if (saveSettings) saveSettings.addEventListener('click', function () {
-      saveTheme();
-      closeModal(modalSettings);
+      if (settingsSaveMsg) { settingsSaveMsg.textContent = ''; settingsSaveMsg.classList.add('hidden'); }
+      var saved = saveTheme();
+      if (saved === false) return;
+      if (saved === true) closeModal(modalSettings);
     });
     if (clearBodyGradientBtn) clearBodyGradientBtn.addEventListener('click', function () {
       if (inputBodyGradientStart) { inputBodyGradientStart.value = '#e6a700'; inputBodyGradientStart.setAttribute('data-use-default', 'true'); }
@@ -579,7 +632,7 @@
       if (adminAddView) adminAddView.classList.add('hidden');
       if (modalAdminTitle) modalAdminTitle.textContent = '管理者驗證';
       if (modalAdminSubtitle) modalAdminSubtitle.classList.add('hidden');
-      openModal(modalAdmin);
+      openModal(modalAdmin, btnAdmin);
       if (adminPassword) setTimeout(function () { adminPassword.focus(); }, 100);
     });
 
@@ -637,7 +690,14 @@
         if (adminMessageAdd) { adminMessageAdd.textContent = '請填寫工具名稱與網址'; adminMessageAdd.classList.remove('hidden', 'success'); adminMessageAdd.classList.add('error'); }
         return;
       }
+      try {
+        new URL(url);
+      } catch (err) {
+        if (adminMessageAdd) { adminMessageAdd.textContent = '請輸入有效的網址'; adminMessageAdd.classList.remove('hidden', 'success'); adminMessageAdd.classList.add('error'); }
+        return;
+      }
       if (adminMessageAdd) adminMessageAdd.classList.add('hidden');
+      if (submitTool) submitTool.disabled = true;
       var isEdit = !!editingToolId;
       var body = {
         password: password,
@@ -677,9 +737,11 @@
           } else {
             if (adminMessageAdd) { adminMessageAdd.textContent = data.error || (isEdit ? '儲存失敗' : '新增失敗'); adminMessageAdd.classList.remove('hidden', 'success'); adminMessageAdd.classList.add('error'); }
           }
+          if (submitTool) submitTool.disabled = false;
         }); })
         .catch(function (err) {
           if (adminMessageAdd) { adminMessageAdd.textContent = '無法連線後端：' + (err.message || '請確認伺服器已啟動'); adminMessageAdd.classList.remove('hidden', 'success'); adminMessageAdd.classList.add('error'); }
+          if (submitTool) submitTool.disabled = false;
         });
     });
 
@@ -777,6 +839,7 @@
         return;
       }
       if (wishPoolMsg) wishPoolMsg.classList.add('hidden');
+      wishPoolSubmit.disabled = true;
       fetch(API_BASE + '/api/wishes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -792,9 +855,11 @@
             wishPoolMsg.classList.remove('hidden', 'success');
             wishPoolMsg.classList.add('error');
           }
+          wishPoolSubmit.disabled = false;
         })
         .catch(function () {
           if (wishPoolMsg) { wishPoolMsg.textContent = '無法送出，請稍後再試'; wishPoolMsg.classList.remove('hidden', 'success'); wishPoolMsg.classList.add('error'); }
+          wishPoolSubmit.disabled = false;
         });
     });
 

@@ -283,6 +283,31 @@ body {
   color: #c53030;
 }
 
+.error-wrap {
+  text-align: center;
+  padding: 1rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.error-wrap .error {
+  margin: 0;
+  padding: 0;
+}
+
+.settings-save-msg {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.theme-dark .settings-save-msg {
+  color: var(--text-muted);
+}
+
 .hidden {
   display: none !important;
 }

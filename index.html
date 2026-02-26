@@ -29,7 +29,10 @@
 
   <main class="main" id="mainContent">
     <p class="loading" id="loading">載入中…</p>
-    <p class="error hidden" id="error"></p>
+    <div class="error-wrap hidden" id="errorWrap">
+      <p class="error" id="error"></p>
+      <button type="button" class="btn btn-primary" id="errorRetry">重試</button>
+    </div>
     <div class="cards-container" id="cardsContainer">
       <!-- 卡片由 JS 動態產生 -->
     </div>
@@ -104,6 +107,7 @@
         </select>
       </div>
       <div class="modal-footer">
+        <p class="settings-save-msg hidden" id="settingsSaveMsg"></p>
         <button type="button" class="btn btn-primary" id="saveSettings">儲存</button>
       </div>
     </div>
