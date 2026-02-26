@@ -1,7 +1,11 @@
 {
   "version": 2,
-  "buildCommand": null,
-  "outputDirectory": ".",
+  "builds": [
+    { "src": "api/tools.js", "use": "@vercel/node" },
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "css/*", "use": "@vercel/static" },
+    { "src": "js/*", "use": "@vercel/static" }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" }
   ],
