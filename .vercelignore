@@ -1,0 +1,3 @@
+# 部署時排除：僅本機 npm run dev 使用
+server.js
+data/

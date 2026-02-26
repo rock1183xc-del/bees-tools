@@ -2,10 +2,10 @@
   "name": "bee-tools-hub",
   "version": "1.0.0",
   "description": "我愛里蜂群好用工具集錦",
-  "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "vercel-build": "echo 'Static + API'"
   },
   "dependencies": {
     "@upstash/redis": "^1.28.0",
