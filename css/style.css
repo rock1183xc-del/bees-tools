@@ -546,11 +546,40 @@ body {
 }
 
 /* 暗色模式：背景偏暗時自動改用淺色文字與邊框 */
+.theme-dark body,
+.theme-dark .main,
+.theme-dark .card,
+.theme-dark .modal-content,
+.theme-dark .modal-body {
+  color: var(--text);
+}
+.theme-dark .card-title,
+.theme-dark .modal-header h2,
+.theme-dark .modal-body label {
+  color: var(--text);
+}
+.theme-dark .card-desc,
+.theme-dark .card-action,
+.theme-dark .modal-subtitle,
+.theme-dark .modal-body .form-hint,
+.theme-dark .loading,
+.theme-dark .admin-tool-list-empty {
+  color: var(--text-muted);
+}
+.theme-dark .modal-close {
+  color: var(--text-muted);
+}
+.theme-dark .modal-close:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+}
 .theme-dark .modal-header {
   background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
 }
 .theme-dark .modal-footer {
   background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
 }
 .theme-dark .modal-body input,
 .theme-dark .modal-body select {
@@ -558,8 +587,32 @@ body {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text);
 }
+.theme-dark .modal-body input::placeholder {
+  color: var(--text-muted);
+}
+.theme-dark .wish-pool-panel,
+.theme-dark .wish-pool-panel-header,
+.theme-dark .wish-pool-bubble {
+  color: var(--text);
+}
 .theme-dark .wish-pool-panel-header {
   background: rgba(255, 255, 255, 0.08);
+}
+.theme-dark .card-badge {
+  color: var(--button-color);
+}
+.theme-dark .settings-row .label-inline {
+  color: var(--text);
+}
+.theme-dark .error {
+  color: #feb2b2;
+}
+.theme-dark .btn-delete {
+  color: #feb2b2;
+  border-color: rgba(254, 178, 178, 0.5);
+}
+.theme-dark .btn-delete:hover {
+  background: rgba(254, 178, 178, 0.15);
 }
 .theme-dark .loading,
 .theme-dark .admin-tool-list-empty {

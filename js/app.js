@@ -171,14 +171,20 @@
       document.body.classList.remove('card-radius-small', 'card-radius-medium', 'card-radius-large');
       if (theme.cardRadius) document.body.classList.add('card-radius-' + theme.cardRadius);
       var cardBg = (theme.cardBgColor !== undefined && theme.cardBgColor !== null) ? (theme.cardBgColor || '#ffffff') : '#ffffff';
+      var cardBgEnd = (theme.cardBgColorEnd && theme.cardBgColorEnd.trim()) || '';
       var modalBg = (theme.modalBgColor !== undefined && theme.modalBgColor !== null) ? (theme.modalBgColor || '#ffffff') : '#ffffff';
+      var modalBgEnd = (theme.modalBgColorEnd && theme.modalBgColorEnd.trim()) || '';
       var bodyStart = (theme.bodyGradientStart && theme.bodyGradientStart.trim()) || (theme.primaryColor && theme.primaryColor.trim()) || '';
-      var isDark = getLuminance(cardBg) < 0.4 || getLuminance(modalBg) < 0.4 || (bodyStart && getLuminance(bodyStart) < 0.4);
+      var bodyEnd = (theme.bodyGradientEnd && theme.bodyGradientEnd.trim()) || (theme.primaryColorEnd && theme.primaryColorEnd.trim()) || '';
+      var primary = (theme.primaryColor && theme.primaryColor.trim()) || '';
+      var lum = function (hex) { return hex ? getLuminance(hex) : 1; };
+      var dark = 0.5;
+      var isDark = lum(cardBg) < dark || lum(cardBgEnd) < dark || lum(modalBg) < dark || lum(modalBgEnd) < dark || lum(bodyStart) < dark || lum(bodyEnd) < dark || lum(primary) < dark;
       if (isDark) {
         root.classList.add('theme-dark');
         root.style.setProperty('--text', '#f0f0f0');
-        root.style.setProperty('--text-muted', '#b8b8b8');
-        root.style.setProperty('--card-border', 'rgba(255,255,255,0.12)');
+        root.style.setProperty('--text-muted', '#c0c0c0');
+        root.style.setProperty('--card-border', 'rgba(255,255,255,0.15)');
       } else {
         root.classList.remove('theme-dark');
         root.style.removeProperty('--text');
