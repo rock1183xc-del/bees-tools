@@ -1,0 +1,16 @@
+[
+  {
+    "id": "sample-1",
+    "name": "範例工具一",
+    "url": "https://example.com",
+    "description": "這是第一筆範例工具，管理者可新增更多。",
+    "icon": ""
+  },
+  {
+    "id": "sample-2",
+    "name": "範例工具二",
+    "url": "https://example.org",
+    "description": "點擊卡片即可開啟連結。",
+    "icon": ""
+  }
+]

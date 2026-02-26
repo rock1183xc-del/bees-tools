@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我愛里蜂群好用工具集錦</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <h1 class="title">我愛里蜂群好用工具集錦</h1>
+    <div class="header-actions">
+      <button type="button" class="btn btn-settings" id="btnSettings">設定</button>
+      <button type="button" class="btn btn-admin" id="btnAdmin">管理者</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="cards-container" id="cardsContainer">
+      <!-- 卡片由 JS 動態產生 -->
+    </div>
+    <p class="loading" id="loading">載入中…</p>
+    <p class="error hidden" id="error"></p>
+  </main>
+
+  <!-- 外觀設定 Modal -->
+  <div class="modal hidden" id="modalSettings">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>外觀設定</h2>
+        <button type="button" class="modal-close" id="closeSettings">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label>主題色</label>
+        <input type="color" id="inputPrimaryColor" value="#e6a700">
+        <label>字體大小</label>
+        <select id="inputFontSize">
+          <option value="small">小</option>
+          <option value="medium" selected>中</option>
+          <option value="large">大</option>
+        </select>
+        <label>卡片間距</label>
+        <select id="inputCardSpacing">
+          <option value="compact">緊湊</option>
+          <option value="normal" selected>一般</option>
+          <option value="relaxed">寬鬆</option>
+        </select>
+        <label>卡片圓角</label>
+        <select id="inputCardRadius">
+          <option value="small">小</option>
+          <option value="medium" selected>中</option>
+          <option value="large">大</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="saveSettings">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理者 Modal -->
+  <div class="modal hidden" id="modalAdmin">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>新增工具</h2>
+        <button type="button" class="modal-close" id="closeAdmin">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label>管理者密碼</label>
+        <input type="password" id="adminPassword" placeholder="請輸入密碼">
+        <label>工具名稱</label>
+        <input type="text" id="toolName" placeholder="必填">
+        <label>網址</label>
+        <input type="url" id="toolUrl" placeholder="https://...">
+        <label>簡短說明（選填）</label>
+        <input type="text" id="toolDescription" placeholder="選填">
+        <p class="admin-message hidden" id="adminMessage"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="submitTool">新增</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
