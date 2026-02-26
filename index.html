@@ -126,8 +126,14 @@
           <input type="url" id="toolUrl" placeholder="https://...">
           <label>簡短說明（選填）</label>
           <input type="text" id="toolDescription" placeholder="選填">
-          <label>卡片圖示網址（選填）</label>
-          <input type="url" id="toolIcon" placeholder="留空則自動使用該網站的 favicon">
+          <label>卡片圖示（選填）</label>
+          <input type="url" id="toolIcon" placeholder="圖示網址，留空則自動使用該網站的 favicon">
+          <div class="settings-upload-row">
+            <span>或上傳圖片</span>
+            <input type="file" id="toolIconFile" accept="image/*">
+            <button type="button" class="btn btn-text" id="clearToolIconBtn">清除上傳</button>
+          </div>
+          <div class="tool-icon-preview hidden" id="toolIconPreview"><img id="toolIconPreviewImg" src="" alt="預覽"></div>
           <p class="admin-message hidden" id="adminMessageAdd"></p>
           <div class="modal-footer-inline">
             <button type="button" class="btn btn-primary" id="submitTool">新增</button>

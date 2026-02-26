@@ -455,6 +455,18 @@ body {
   color: var(--button-color);
 }
 
+.tool-icon-preview {
+  margin-top: 0.5rem;
+}
+
+.tool-icon-preview img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+}
+
 .modal-footer {
   padding: 1rem 1.35rem;
   border-top: 1px solid var(--card-border);

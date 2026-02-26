@@ -32,6 +32,10 @@
     const toolTypeHint = document.getElementById('toolTypeHint');
     const labelToolUrl = document.getElementById('labelToolUrl');
     const toolIcon = document.getElementById('toolIcon');
+    const toolIconFile = document.getElementById('toolIconFile');
+    const clearToolIconBtn = document.getElementById('clearToolIconBtn');
+    const toolIconPreview = document.getElementById('toolIconPreview');
+    const toolIconPreviewImg = document.getElementById('toolIconPreviewImg');
     const submitTool = document.getElementById('submitTool');
     const adminMessage = document.getElementById('adminMessage');
     const adminMessageAdd = document.getElementById('adminMessageAdd');
@@ -58,6 +62,7 @@
     var adminMode = false;
     var storedAdminPassword = '';
     var editingToolId = '';
+    var uploadedIconDataUrl = '';
 
     function updateToolTypeHint() {
       if (!toolTypeHint || !labelToolUrl) return;
@@ -184,9 +189,19 @@
       }
     }
 
+    function getFaviconFallbackUrl(url) {
+      try {
+        var u = new URL(url);
+        return u.origin + '/favicon.ico';
+      } catch (e) {
+        return '';
+      }
+    }
+
     function getCardIconUrl(tool) {
       if (tool.icon && String(tool.icon).trim()) return String(tool.icon).trim();
-      return getFaviconUrl(tool.url);
+      if (tool.url && String(tool.url).trim()) return getFaviconUrl(tool.url);
+      return '';
     }
 
     function renderCards(tools, isAdminMode) {
@@ -203,6 +218,10 @@
       list.forEach(function (tool) {
         var isPlugin = tool.type === 'plugin';
         var iconUrl = getCardIconUrl(tool);
+        var fallbackUrl = '';
+        if (iconUrl && iconUrl.indexOf('data:') !== 0 && tool.url) {
+          fallbackUrl = getFaviconFallbackUrl(tool.url);
+        }
         var iconHtml = iconUrl
           ? '<div class="card-icon"><img class="card-icon-img" src="' + escapeHtml(iconUrl) + '" alt="" loading="lazy"></div>'
           : '<div class="card-icon" aria-hidden="true"></div>';
@@ -243,6 +262,17 @@
             openEditModal(tool);
           });
           cardsContainer.appendChild(wrap);
+          if (fallbackUrl) {
+            var iconImg = wrap.querySelector('.card-icon img');
+            if (iconImg) {
+              iconImg.setAttribute('data-fallback', fallbackUrl);
+              iconImg.onerror = function () {
+                iconImg.onerror = null;
+                var fb = iconImg.getAttribute('data-fallback');
+                if (fb) iconImg.src = fb;
+              };
+            }
+          }
         } else {
           var a = document.createElement('a');
           a.className = 'card' + (isPlugin ? ' card--plugin' : '');
@@ -252,6 +282,17 @@
           if (isPlugin) a.setAttribute('download', '');
           a.innerHTML = cardInner;
           cardsContainer.appendChild(a);
+          if (fallbackUrl) {
+            var iconImg = a.querySelector('.card-icon img');
+            if (iconImg) {
+              iconImg.setAttribute('data-fallback', fallbackUrl);
+              iconImg.onerror = function () {
+                iconImg.onerror = null;
+                var fb = iconImg.getAttribute('data-fallback');
+                if (fb) iconImg.src = fb;
+              };
+            }
+          }
         }
       });
 
@@ -263,10 +304,14 @@
         addCard.innerHTML = '<span class="card-add-icon">+</span>';
         addCard.addEventListener('click', function () {
           editingToolId = '';
+          uploadedIconDataUrl = '';
           if (toolName) toolName.value = '';
           if (toolUrl) toolUrl.value = '';
           if (toolDescription) toolDescription.value = '';
           if (toolIcon) toolIcon.value = '';
+          if (toolIconFile) toolIconFile.value = '';
+          if (toolIconPreview) toolIconPreview.classList.add('hidden');
+          if (toolIconPreviewImg) toolIconPreviewImg.src = '';
           if (toolType) toolType.value = 'link';
           updateToolTypeHint();
           if (adminMessageAdd) { adminMessageAdd.textContent = ''; adminMessageAdd.classList.add('hidden'); }
@@ -290,7 +335,20 @@
       if (toolName) toolName.value = tool.name || '';
       if (toolUrl) toolUrl.value = tool.url || '';
       if (toolDescription) toolDescription.value = tool.description || '';
-      if (toolIcon) toolIcon.value = tool.icon || '';
+      var iconVal = (tool.icon && String(tool.icon).trim()) ? tool.icon.trim() : '';
+      if (iconVal && iconVal.indexOf('data:') === 0) {
+        uploadedIconDataUrl = iconVal;
+        if (toolIcon) toolIcon.value = '';
+        if (toolIconFile) toolIconFile.value = '';
+        if (toolIconPreviewImg) toolIconPreviewImg.src = iconVal;
+        if (toolIconPreview) toolIconPreview.classList.remove('hidden');
+      } else {
+        uploadedIconDataUrl = '';
+        if (toolIcon) toolIcon.value = iconVal;
+        if (toolIconFile) toolIconFile.value = '';
+        if (toolIconPreview) toolIconPreview.classList.add('hidden');
+        if (toolIconPreviewImg) toolIconPreviewImg.src = '';
+      }
       if (toolType) toolType.value = (tool.type === 'plugin') ? 'plugin' : 'link';
       updateToolTypeHint();
       if (adminMessageAdd) { adminMessageAdd.textContent = ''; adminMessageAdd.classList.add('hidden'); }
@@ -389,6 +447,24 @@
         applyTheme(theme);
       } catch (e) {}
     });
+    if (toolIconFile) toolIconFile.addEventListener('change', function () {
+      var file = toolIconFile.files && toolIconFile.files[0];
+      if (!file) return;
+      var fr = new FileReader();
+      fr.onload = function () {
+        uploadedIconDataUrl = fr.result;
+        if (toolIconPreviewImg) toolIconPreviewImg.src = uploadedIconDataUrl;
+        if (toolIconPreview) toolIconPreview.classList.remove('hidden');
+        if (toolIcon) toolIcon.value = '';
+      };
+      fr.readAsDataURL(file);
+    });
+    if (clearToolIconBtn) clearToolIconBtn.addEventListener('click', function () {
+      uploadedIconDataUrl = '';
+      if (toolIconFile) toolIconFile.value = '';
+      if (toolIconPreview) toolIconPreview.classList.add('hidden');
+      if (toolIconPreviewImg) toolIconPreviewImg.src = '';
+    });
     modalSettings.addEventListener('click', function (e) {
       if (e.target === modalSettings) closeModal(modalSettings);
     });
@@ -467,7 +543,7 @@
           name: name,
           url: url,
           description: toolDescription ? toolDescription.value.trim() : '',
-          icon: toolIcon ? toolIcon.value.trim() : '',
+          icon: (uploadedIconDataUrl || (toolIcon && toolIcon.value.trim()) || '').trim(),
           type: (toolType && toolType.value === 'plugin') ? 'plugin' : 'link'
         }
       };
@@ -487,7 +563,11 @@
             if (toolName) toolName.value = '';
             if (toolUrl) toolUrl.value = '';
             if (toolDescription) toolDescription.value = '';
+            uploadedIconDataUrl = '';
             if (toolIcon) toolIcon.value = '';
+            if (toolIconFile) toolIconFile.value = '';
+            if (toolIconPreview) toolIconPreview.classList.add('hidden');
+            if (toolIconPreviewImg) toolIconPreviewImg.src = '';
             fetchTools();
             closeModal(modalAdmin);
           } else {
