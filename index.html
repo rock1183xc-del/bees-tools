@@ -4,12 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>我愛里蜂群好用工具集錦</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <!-- 關鍵樣式：確保一進來只看到標題+卡片區，彈窗預設隱藏（即使外部 CSS 未載入也生效） -->
+  <style>
+    .hidden { display: none !important; }
+    .modal.hidden { display: none !important; visibility: hidden !important; pointer-events: none !important; }
+    .modal { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); padding: 1rem; }
+    .modal:not(.hidden) { display: flex !important; visibility: visible !important; pointer-events: auto !important; }
+  </style>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
   <header class="header">
@@ -96,6 +103,6 @@
     </div>
   </div>
 
-  <script src="js/app.js?v=2"></script>
+  <script src="js/app.js?v=3"></script>
 </body>
 </html>
