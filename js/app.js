@@ -90,8 +90,10 @@
       var start = theme.bodyGradientStart && theme.bodyGradientStart.trim();
       var end = theme.bodyGradientEnd && theme.bodyGradientEnd.trim();
       if (start && end) {
-        root.style.setProperty('--body-pattern', 'linear-gradient(135deg, color-mix(in srgb, ' + start + ' 28%, transparent) 0%, color-mix(in srgb, ' + end + ' 12%, transparent) 100%)');
+        root.style.setProperty('--body-bg', start);
+        root.style.setProperty('--body-pattern', 'linear-gradient(135deg, ' + start + ' 0%, ' + end + ' 100%)');
       } else {
+        root.style.setProperty('--body-bg', '#f0f2f5');
         root.style.setProperty('--body-pattern', 'radial-gradient(ellipse at top, color-mix(in srgb, var(--primary) 22%, transparent) 0%, transparent 55%)');
       }
       if (theme.backgroundImage) {
