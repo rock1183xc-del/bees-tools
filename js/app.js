@@ -200,7 +200,7 @@
 
     function getCardIconUrl(tool) {
       if (tool.icon && String(tool.icon).trim()) return String(tool.icon).trim();
-      if (tool.url && String(tool.url).trim()) return getFaviconUrl(tool.url);
+      if (tool.url && String(tool.url).trim()) return getFaviconFallbackUrl(tool.url);
       return '';
     }
 
@@ -220,7 +220,7 @@
         var iconUrl = getCardIconUrl(tool);
         var fallbackUrl = '';
         if (iconUrl && iconUrl.indexOf('data:') !== 0 && tool.url) {
-          fallbackUrl = getFaviconFallbackUrl(tool.url);
+          fallbackUrl = getFaviconUrl(tool.url);
         }
         var iconHtml = iconUrl
           ? '<div class="card-icon"><img class="card-icon-img" src="' + escapeHtml(iconUrl) + '" alt="" loading="lazy"></div>'
@@ -487,6 +487,12 @@
       if (adminPassword) setTimeout(function () { adminPassword.focus(); }, 100);
     });
 
+    if (adminPassword) adminPassword.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (adminVerifyBtn) adminVerifyBtn.click();
+      }
+    });
     if (adminVerifyBtn) adminVerifyBtn.addEventListener('click', function () {
       var pwd = adminPassword ? adminPassword.value.trim() : '';
       if (!pwd) { showAdminMessage('請輸入密碼', true); return; }
